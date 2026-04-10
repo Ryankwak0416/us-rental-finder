@@ -485,7 +485,7 @@ function doSearch() {
   const cats = getSelectedCategories();
   // Open Google Maps with first relevant query
   const mapQuery = cats.includes('all') ? 'rental near ' + loc : cats[0] + ' rental near ' + loc;
-  window.open('https://www.google.com/search?q=' + encodeURIComponent(mapQuery), '_blank');
+  window.open('https://maps.google.com/maps?q=' + encodeURIComponent(mapQuery), '_blank');
   showResults(loc, cats);
 }
 
@@ -527,7 +527,7 @@ function reverseGeocode(lat, lng) {
         document.getElementById('addressInput').value = loc;
         const cats = getSelectedCategories();
         const mapQuery = cats.includes('all') ? 'rental near ' + loc : cats[0] + ' rental near ' + loc;
-        window.open('https://www.google.com/search?q=' + encodeURIComponent(mapQuery), '_blank');
+        window.open('https://maps.google.com/maps?q=' + encodeURIComponent(mapQuery), '_blank');
         showResults(loc, cats);
       } else {
         gpsDirectMap(lat, lng);
@@ -541,7 +541,7 @@ function reverseGeocode(lat, lng) {
 }
 
 function gpsDirectMap(lat, lng) {
-  window.open(`https://www.google.com/search?q=${encodeURIComponent("rental near " + lat + "," + lng)}`, '_blank');
+  window.open(`https://maps.google.com/maps?q=rental+near+me&center=${lat},${lng}&zoom=14`, '_blank');
 }
 
 /* ========== Show Results ========== */
@@ -556,11 +556,11 @@ function showResults(loc, cats) {
   html += `<div class="result-card">
     <h3>🗺️ 지도 열기</h3>
     <div class="sub-links">
-      <a href="https://www.google.com/maps/search/${e('rental near ' + loc)}" target="_blank">
-        📍 구글 지도 (앱) <span class="arrow">›</span>
+      <a href="https://maps.google.com/maps?q=${e('rental near ' + loc)}" target="_blank">
+        📍 구글 지도 <span class="arrow">›</span>
       </a>
       <a href="https://www.google.com/search?q=${e('rental near ' + loc)}" target="_blank">
-        🔍 구글 검색 (브라우저) <span class="arrow">›</span>
+        🔍 구글 검색 <span class="arrow">›</span>
       </a>
     </div>
   </div>`;
@@ -583,7 +583,7 @@ function showResults(loc, cats) {
       <h3>🚜 장비 렌탈</h3>
       <div class="links">`;
     equips.forEach(eq => {
-      html += `<a href="https://www.google.com/search?q=${e(eq.q + ' rental near ' + loc)}" target="_blank">
+      html += `<a href="https://maps.google.com/maps?q=${e(eq.q + ' rental near ' + loc)}" target="_blank">
         ${eq.icon} ${eq.label} 렌탈 <span class="arrow">›</span>
       </a>`;
     });
@@ -596,7 +596,7 @@ function showResults(loc, cats) {
           <a href="https://www.sunbeltrentals.com/locations/?q=${e(loc)}" target="_blank">
             🟡 Sunbelt Rentals <span class="arrow">›</span>
           </a>
-          <a href="https://www.google.com/search?q=${e('equipment rental near ' + loc)}" target="_blank">
+          <a href="https://maps.google.com/maps?q=${e('equipment rental near ' + loc)}" target="_blank">
             🔍 전체 검색 <span class="arrow">›</span>
           </a>
           <a href="https://www.yelp.com/search?find_desc=${e('equipment rental')}&find_loc=${e(loc)}" target="_blank">
@@ -612,13 +612,13 @@ function showResults(loc, cats) {
     html += `<div class="result-card">
       <h3>🚗 차량 렌탈</h3>
       <div class="sub-links">
-        <a href="https://www.google.com/search?q=${e('car rental near ' + loc)}" target="_blank">
+        <a href="https://maps.google.com/maps?q=${e('car rental near ' + loc)}" target="_blank">
           🚗 승용차 렌탈 <span class="arrow">›</span>
         </a>
-        <a href="https://www.google.com/search?q=${e('truck rental near ' + loc)}" target="_blank">
+        <a href="https://maps.google.com/maps?q=${e('truck rental near ' + loc)}" target="_blank">
           🚛 트럭 렌탈 <span class="arrow">›</span>
         </a>
-        <a href="https://www.google.com/search?q=${e('van rental near ' + loc)}" target="_blank">
+        <a href="https://maps.google.com/maps?q=${e('van rental near ' + loc)}" target="_blank">
           🚐 밴 렌탈 <span class="arrow">›</span>
         </a>
         <a href="https://www.uhaul.com/Locations/" target="_blank">
@@ -642,13 +642,13 @@ function showResults(loc, cats) {
     html += `<div class="result-card">
       <h3>🏨 숙소</h3>
       <div class="sub-links">
-        <a href="https://www.google.com/search?q=${e('hotel near ' + loc)}" target="_blank">
+        <a href="https://maps.google.com/maps?q=${e('hotel near ' + loc)}" target="_blank">
           🗺️ 호텔 지도 검색 <span class="arrow">›</span>
         </a>
-        <a href="https://www.google.com/search?q=${e('motel near ' + loc)}" target="_blank">
+        <a href="https://maps.google.com/maps?q=${e('motel near ' + loc)}" target="_blank">
           🏩 모텔 지도 검색 <span class="arrow">›</span>
         </a>
-        <a href="https://www.google.com/search?q=${e('extended stay near ' + loc)}" target="_blank">
+        <a href="https://maps.google.com/maps?q=${e('extended stay near ' + loc)}" target="_blank">
           🏢 장기 숙박 <span class="arrow">›</span>
         </a>
         <a href="https://www.booking.com/searchresults.html?ss=${e(loc)}" target="_blank">
@@ -672,7 +672,7 @@ function showResults(loc, cats) {
     html += `<div class="result-card">
       <h3>🏠 주거·아파트</h3>
       <div class="sub-links">
-        <a href="https://www.google.com/search?q=${e('apartments for rent near ' + loc)}" target="_blank">
+        <a href="https://maps.google.com/maps?q=${e('apartments for rent near ' + loc)}" target="_blank">
           🗺️ 아파트 지도 검색 <span class="arrow">›</span>
         </a>
         <a href="https://www.zillow.com/homes/for_rent/${e(loc)}_rb/" target="_blank">
@@ -684,10 +684,10 @@ function showResults(loc, cats) {
         <a href="https://www.realtor.com/apartments/${e(loc.toLowerCase().replace(/[,\s]+/g, '-'))}" target="_blank">
           🔴 Realtor.com <span class="arrow">›</span>
         </a>
-        <a href="https://www.google.com/search?q=${e('rooms for rent near ' + loc)}" target="_blank">
+        <a href="https://maps.google.com/maps?q=${e('rooms for rent near ' + loc)}" target="_blank">
           🔍 룸 렌트 <span class="arrow">›</span>
         </a>
-        <a href="https://www.google.com/search?q=${e('craigslist apartments ' + loc)}" target="_blank">
+        <a href="https://maps.google.com/maps?q=${e('craigslist apartments ' + loc)}" target="_blank">
           📋 Craigslist <span class="arrow">›</span>
         </a>
       </div>
@@ -699,28 +699,28 @@ function showResults(loc, cats) {
     html += `<div class="result-card">
       <h3>🍚 한식·아시안 레스토랑</h3>
       <div class="links">
-        <a href="https://www.google.com/search?q=${e('Korean restaurant near ' + loc)}" target="_blank">
+        <a href="https://maps.google.com/maps?q=${e('Korean restaurant near ' + loc)}" target="_blank">
           🇰🇷 한식 레스토랑 <span class="arrow">›</span>
         </a>
-        <a href="https://www.google.com/search?q=${e('Korean BBQ near ' + loc)}" target="_blank">
+        <a href="https://maps.google.com/maps?q=${e('Korean BBQ near ' + loc)}" target="_blank">
           🥩 한국 BBQ (고기집) <span class="arrow">›</span>
         </a>
-        <a href="https://www.google.com/search?q=${e('Korean fried chicken near ' + loc)}" target="_blank">
+        <a href="https://maps.google.com/maps?q=${e('Korean fried chicken near ' + loc)}" target="_blank">
           🍗 한국 치킨 <span class="arrow">›</span>
         </a>
-        <a href="https://www.google.com/search?q=${e('Asian restaurant near ' + loc)}" target="_blank">
+        <a href="https://maps.google.com/maps?q=${e('Asian restaurant near ' + loc)}" target="_blank">
           🍜 아시안 레스토랑 <span class="arrow">›</span>
         </a>
-        <a href="https://www.google.com/search?q=${e('Chinese restaurant near ' + loc)}" target="_blank">
+        <a href="https://maps.google.com/maps?q=${e('Chinese restaurant near ' + loc)}" target="_blank">
           🥟 중식 레스토랑 <span class="arrow">›</span>
         </a>
-        <a href="https://www.google.com/search?q=${e('Japanese restaurant near ' + loc)}" target="_blank">
+        <a href="https://maps.google.com/maps?q=${e('Japanese restaurant near ' + loc)}" target="_blank">
           🍣 일식 레스토랑 <span class="arrow">›</span>
         </a>
-        <a href="https://www.google.com/search?q=${e('Thai restaurant near ' + loc)}" target="_blank">
+        <a href="https://maps.google.com/maps?q=${e('Thai restaurant near ' + loc)}" target="_blank">
           🍛 태국 레스토랑 <span class="arrow">›</span>
         </a>
-        <a href="https://www.google.com/search?q=${e('Vietnamese restaurant near ' + loc)}" target="_blank">
+        <a href="https://maps.google.com/maps?q=${e('Vietnamese restaurant near ' + loc)}" target="_blank">
           🍲 베트남 레스토랑 <span class="arrow">›</span>
         </a>
       </div>
@@ -742,19 +742,19 @@ function showResults(loc, cats) {
     html += `<div class="result-card">
       <h3>🌾 글루텐프리 레스토랑</h3>
       <div class="links">
-        <a href="https://www.google.com/search?q=${e('gluten free restaurant near ' + loc)}" target="_blank">
+        <a href="https://maps.google.com/maps?q=${e('gluten free restaurant near ' + loc)}" target="_blank">
           🌿 글루텐프리 레스토랑 (지도) <span class="arrow">›</span>
         </a>
-        <a href="https://www.google.com/search?q=${e('gluten free bakery near ' + loc)}" target="_blank">
+        <a href="https://maps.google.com/maps?q=${e('gluten free bakery near ' + loc)}" target="_blank">
           🍞 글루텐프리 베이커리 <span class="arrow">›</span>
         </a>
-        <a href="https://www.google.com/search?q=${e('gluten free pizza near ' + loc)}" target="_blank">
+        <a href="https://maps.google.com/maps?q=${e('gluten free pizza near ' + loc)}" target="_blank">
           🍕 글루텐프리 피자 <span class="arrow">›</span>
         </a>
-        <a href="https://www.google.com/search?q=${e('celiac friendly restaurant near ' + loc)}" target="_blank">
+        <a href="https://maps.google.com/maps?q=${e('celiac friendly restaurant near ' + loc)}" target="_blank">
           ✅ 셀리악 친화 레스토랑 <span class="arrow">›</span>
         </a>
-        <a href="https://www.google.com/search?q=${e('gluten free restaurants near ' + loc)}" target="_blank">
+        <a href="https://maps.google.com/maps?q=${e('gluten free restaurants near ' + loc)}" target="_blank">
           🔍 글루텐프리 전체 검색 <span class="arrow">›</span>
         </a>
       </div>
@@ -776,22 +776,22 @@ function showResults(loc, cats) {
     html += `<div class="result-card">
       <h3>🛒 아시안 식료품점·마트</h3>
       <div class="links">
-        <a href="https://www.google.com/search?q=${e('Asian grocery store near ' + loc)}" target="_blank">
+        <a href="https://maps.google.com/maps?q=${e('Asian grocery store near ' + loc)}" target="_blank">
           🏪 아시안 식료품점 (지도) <span class="arrow">›</span>
         </a>
-        <a href="https://www.google.com/search?q=${e('Korean grocery store near ' + loc)}" target="_blank">
+        <a href="https://maps.google.com/maps?q=${e('Korean grocery store near ' + loc)}" target="_blank">
           🇰🇷 한국 식료품점 <span class="arrow">›</span>
         </a>
-        <a href="https://www.google.com/search?q=${e('H Mart near ' + loc)}" target="_blank">
+        <a href="https://maps.google.com/maps?q=${e('H Mart near ' + loc)}" target="_blank">
           🟢 H Mart (한국 마트) <span class="arrow">›</span>
         </a>
-        <a href="https://www.google.com/search?q=${e('99 Ranch Market near ' + loc)}" target="_blank">
+        <a href="https://maps.google.com/maps?q=${e('99 Ranch Market near ' + loc)}" target="_blank">
           🔴 99 Ranch Market <span class="arrow">›</span>
         </a>
-        <a href="https://www.google.com/search?q=${e('Chinese grocery store near ' + loc)}" target="_blank">
+        <a href="https://maps.google.com/maps?q=${e('Chinese grocery store near ' + loc)}" target="_blank">
           🏬 중국 식료품점 <span class="arrow">›</span>
         </a>
-        <a href="https://www.google.com/search?q=${e('Japanese grocery store near ' + loc)}" target="_blank">
+        <a href="https://maps.google.com/maps?q=${e('Japanese grocery store near ' + loc)}" target="_blank">
           🏬 일본 식료품점 <span class="arrow">›</span>
         </a>
       </div>
@@ -800,7 +800,7 @@ function showResults(loc, cats) {
           <a href="https://www.yelp.com/search?find_desc=${e('asian grocery')}&find_loc=${e(loc)}" target="_blank">
             ⭐ 아시안마트 Yelp <span class="arrow">›</span>
           </a>
-          <a href="https://www.google.com/search?q=${e('asian supermarket near ' + loc)}" target="_blank">
+          <a href="https://maps.google.com/maps?q=${e('asian supermarket near ' + loc)}" target="_blank">
             🔍 전체 검색 <span class="arrow">›</span>
           </a>
         </div>
@@ -813,19 +813,19 @@ function showResults(loc, cats) {
     html += `<div class="result-card">
       <h3>🔧 철물점·공구</h3>
       <div class="sub-links">
-        <a href="https://www.google.com/search?q=${e('hardware store near ' + loc)}" target="_blank">
+        <a href="https://maps.google.com/maps?q=${e('hardware store near ' + loc)}" target="_blank">
           🔩 철물점 <span class="arrow">›</span>
         </a>
-        <a href="https://www.google.com/search?q=${e('Home Depot near ' + loc)}" target="_blank">
+        <a href="https://maps.google.com/maps?q=${e('Home Depot near ' + loc)}" target="_blank">
           🟠 Home Depot <span class="arrow">›</span>
         </a>
-        <a href="https://www.google.com/search?q=${e('Lowes near ' + loc)}" target="_blank">
+        <a href="https://maps.google.com/maps?q=${e('Lowes near ' + loc)}" target="_blank">
           🔵 Lowe's <span class="arrow">›</span>
         </a>
-        <a href="https://www.google.com/search?q=${e('Ace Hardware near ' + loc)}" target="_blank">
+        <a href="https://maps.google.com/maps?q=${e('Ace Hardware near ' + loc)}" target="_blank">
           🔴 Ace Hardware <span class="arrow">›</span>
         </a>
-        <a href="https://www.google.com/search?q=${e('tool rental near ' + loc)}" target="_blank">
+        <a href="https://maps.google.com/maps?q=${e('tool rental near ' + loc)}" target="_blank">
           🔧 공구 렌탈 <span class="arrow">›</span>
         </a>
         <a href="https://www.yelp.com/search?find_desc=${e('hardware store')}&find_loc=${e(loc)}" target="_blank">
@@ -840,16 +840,16 @@ function showResults(loc, cats) {
     html += `<div class="result-card">
       <h3>📦 창고·저장공간</h3>
       <div class="sub-links">
-        <a href="https://www.google.com/search?q=${e('self storage near ' + loc)}" target="_blank">
+        <a href="https://maps.google.com/maps?q=${e('self storage near ' + loc)}" target="_blank">
           🗺️ 창고 지도 검색 <span class="arrow">›</span>
         </a>
-        <a href="https://www.google.com/search?q=${e('Public Storage near ' + loc)}" target="_blank">
+        <a href="https://maps.google.com/maps?q=${e('Public Storage near ' + loc)}" target="_blank">
           🟠 Public Storage <span class="arrow">›</span>
         </a>
-        <a href="https://www.google.com/search?q=${e('Extra Space Storage near ' + loc)}" target="_blank">
+        <a href="https://maps.google.com/maps?q=${e('Extra Space Storage near ' + loc)}" target="_blank">
           🟢 Extra Space Storage <span class="arrow">›</span>
         </a>
-        <a href="https://www.google.com/search?q=${e('storage units near ' + loc)}" target="_blank">
+        <a href="https://maps.google.com/maps?q=${e('storage units near ' + loc)}" target="_blank">
           🔍 전체 검색 <span class="arrow">›</span>
         </a>
         <a href="https://www.yelp.com/search?find_desc=${e('self storage')}&find_loc=${e(loc)}" target="_blank">
@@ -863,16 +863,16 @@ function showResults(loc, cats) {
   html += `<div class="result-card">
     <h3>🔗 더 찾아보기</h3>
     <div class="sub-links">
-      <a href="https://www.google.com/search?q=${e('rental services near ' + loc)}" target="_blank">
+      <a href="https://maps.google.com/maps?q=${e('rental services near ' + loc)}" target="_blank">
         🔍 구글 검색 <span class="arrow">›</span>
       </a>
       <a href="https://www.yelp.com/search?find_desc=${e('rental')}&find_loc=${e(loc)}" target="_blank">
         ⭐ Yelp 전체 렌탈 <span class="arrow">›</span>
       </a>
-      <a href="https://www.google.com/search?q=${e('rental near ' + loc)}" target="_blank">
+      <a href="https://maps.google.com/maps?q=${e('rental near ' + loc)}" target="_blank">
         🗺️ 전체 지도 <span class="arrow">›</span>
       </a>
-      <a href="https://www.google.com/search?q=${e(loc + ' yellow pages rental')}" target="_blank">
+      <a href="https://maps.google.com/maps?q=${e(loc + ' yellow pages rental')}" target="_blank">
         📒 Yellow Pages <span class="arrow">›</span>
       </a>
     </div>
