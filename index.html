@@ -324,6 +324,7 @@ select:focus, input[type="text"]:focus {
       <div class="chip" onclick="toggleChip(this)">🚜 장비렌탈</div>
       <div class="chip" onclick="toggleChip(this)">🚗 차량렌탈</div>
       <div class="chip" onclick="toggleChip(this)">🏨 숙소</div>
+      <div class="chip" onclick="toggleChip(this)">🏡 홈스테이</div>
       <div class="chip" onclick="toggleChip(this)">🏠 주거</div>
       <div class="chip" onclick="toggleChip(this)">🍚 식당</div>
       <div class="chip" onclick="toggleChip(this)">🌾 글루텐프리</div>
@@ -450,7 +451,7 @@ function getSelectedCategories() {
   return [...chips].map(c => {
     const txt = c.textContent.replace(/[^\w\s\uAC00-\uD7AF]/g, '').trim();
     // Map Korean labels to internal keys
-    const map = {'전체':'all','장비렌탈':'equipment','차량렌탈':'vehicles','숙소':'hotels','주거':'housing','식당':'food','글루텐프리':'glutenfree','아시안':'asian','철물점':'hardware','창고':'storage'};
+    const map = {'전체':'all','장비렌탈':'equipment','차량렌탈':'vehicles','숙소':'hotels','홈스테이':'homestay','주거':'housing','식당':'food','글루텐프리':'glutenfree','아시안':'asian','철물점':'hardware','창고':'storage'};
     return map[txt] || txt.toLowerCase();
   });
 }
@@ -662,6 +663,60 @@ function showResults(loc, cats) {
         </a>
         <a href="https://www.yelp.com/search?find_desc=${e('hotel')}&find_loc=${e(loc)}" target="_blank">
           ⭐ Yelp 리뷰 <span class="arrow">›</span>
+        </a>
+      </div>
+    </div>`;
+  }
+
+  // ---- 홈스테이·통째 렌탈 ----
+  if (isAll || cats.includes('homestay')) {
+    html += `<div class="result-card">
+      <h3>🏡 집 통째로 렌탈</h3>
+      <div class="links">
+        <a href="https://maps.google.com/maps?q=${e('vacation rental near ' + loc)}" target="_blank">
+          🗺️ 휴양지 렌탈 (지도) <span class="arrow">›</span>
+        </a>
+        <a href="https://www.airbnb.com/s/${e(loc)}/homes?room_types%5B%5D=Entire%20home" target="_blank">
+          🟠 Airbnb 전체 집 <span class="arrow">›</span>
+        </a>
+        <a href="https://www.vrbo.com/search?destination=${e(loc)}" target="_blank">
+          🔵 VRBO (통째 렌탈 전문) <span class="arrow">›</span>
+        </a>
+        <a href="https://www.vacasa.com/search?query=${e(loc)}" target="_blank">
+          🟣 Vacasa (별장·휴양지) <span class="arrow">›</span>
+        </a>
+        <a href="https://www.hometogo.com/search/${e(loc)}" target="_blank">
+          🟡 HomeToGo (통합 검색) <span class="arrow">›</span>
+        </a>
+      </div>
+    </div>`;
+
+    html += `<div class="result-card">
+      <h3>🏠 홈스테이·중장기</h3>
+      <div class="links">
+        <a href="https://www.homestay.com/search?search%5Bkeyword%5D=${e(loc)}" target="_blank">
+          🤝 Homestay.com (호스트 가정) <span class="arrow">›</span>
+        </a>
+        <a href="https://www.furnishedfinder.com/housing/${e(loc.toLowerCase().replace(/[,\s]+/g, '-'))}" target="_blank">
+          🛋️ Furnished Finder (가구 완비 월세) <span class="arrow">›</span>
+        </a>
+        <a href="https://www.sublet.com/city/${e(loc.toLowerCase().replace(/[,\s]+/g, '_'))}" target="_blank">
+          📝 Sublet.com (단기 서브렛) <span class="arrow">›</span>
+        </a>
+      </div>
+    </div>`;
+
+    html += `<div class="result-card">
+      <h3>⛺ 캐빈·글램핑</h3>
+      <div class="links">
+        <a href="https://www.hipcamp.com/en-US/search?q=${e(loc)}" target="_blank">
+          🏕️ Hipcamp (캠핑·캐빈) <span class="arrow">›</span>
+        </a>
+        <a href="https://www.glampinghub.com/search?query=${e(loc)}" target="_blank">
+          ✨ Glamping Hub (고급 글램핑) <span class="arrow">›</span>
+        </a>
+        <a href="https://maps.google.com/maps?q=${e('cabin rental near ' + loc)}" target="_blank">
+          🏔️ 캐빈 렌탈 (지도) <span class="arrow">›</span>
         </a>
       </div>
     </div>`;
