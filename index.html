@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>미국 렌탈파인더 - 내 주변 렌탈 검색</title>
+<style>
+:root {
+  --primary: #FF6B00;
+  --primary-light: #FF8533;
+  --dark: #1A1A2E;
+  --gray: #6B7280;
+  --light-gray: #F3F4F6;
+  --white: #FFFFFF;
+  --green: #10B981;
+  --red: #EF4444;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--light-gray);
+  color: var(--dark);
+  max-width: 600px;
+  margin: 0 auto;
+  min-height: 100vh;
+}
+
+/* Header */
+.header {
+  background: var(--white);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 3px solid var(--primary);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.header .logo { font-size: 28px; }
+.header .title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--dark);
+}
+.header .title span { color: var(--primary); }
+.header .subtitle {
+  font-size: 11px;
+  color: var(--gray);
+  margin-top: 2px;
+}
+
+/* Search Box */
+.search-box {
+  background: var(--white);
+  margin: 12px;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.search-box h2 {
+  font-size: 16px;
+  margin-bottom: 14px;
+  color: var(--dark);
+}
+.form-group { margin-bottom: 12px; }
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gray);
+  margin-bottom: 6px;
+}
+select, input[type="text"] {
+  width: 100%;
+  padding: 12px 14px;
+  border: 2px solid #E5E7EB;
+  border-radius: 10px;
+  font-size: 15px;
+  color: var(--dark);
+  background: var(--white);
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+  transition: border-color 0.2s;
+}
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M6 8L1 3h10z' fill='%236B7280'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+}
+select:focus, input[type="text"]:focus {
+  border-color: var(--primary);
+}
+
+/* Category Chips */
+.chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+.chip {
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 2px solid #E5E7EB;
+  background: var(--white);
+  color: var(--gray);
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+}
+.chip.active {
+  background: var(--primary);
+  color: var(--white);
+  border-color: var(--primary);
+}
+.chip:hover { border-color: var(--primary-light); }
+
+/* Buttons */
+.btn-search {
+  width: 100%;
+  padding: 14px;
+  background: var(--primary);
+  color: var(--white);
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: opacity 0.2s;
+}
+.btn-search:active { opacity: 0.8; }
+
+.btn-gps {
+  width: 100%;
+  padding: 12px;
+  background: var(--white);
+  color: var(--primary);
+  border: 2px solid var(--primary);
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+.btn-gps:active { background: #FFF5EB; }
+.btn-gps.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+.btn-gps.loading .gps-icon { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Address Input */
+.or-divider {
+  text-align: center;
+  color: var(--gray);
+  font-size: 12px;
+  margin: 10px 0;
+  position: relative;
+}
+.or-divider::before, .or-divider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 40%;
+  height: 1px;
+  background: #E5E7EB;
+}
+.or-divider::before { left: 0; }
+.or-divider::after { right: 0; }
+
+/* Results */
+#results {
+  margin: 0 12px 20px;
+}
+.result-card {
+  background: var(--white);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+.result-card h3 {
+  font-size: 15px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.result-card .links {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.result-card a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--light-gray);
+  border-radius: 10px;
+  text-decoration: none;
+  color: var(--dark);
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+.result-card a:active { background: #E5E7EB; }
+.result-card a .arrow {
+  margin-left: auto;
+  color: var(--gray);
+  font-size: 12px;
+}
+
+/* Status */
+.status-bar {
+  background: var(--green);
+  color: var(--white);
+  padding: 10px 16px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Sub-links grid */
+.sub-links {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.sub-links a {
+  font-size: 13px;
+  padding: 10px 12px;
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 20px;
+  color: var(--gray);
+  font-size: 12px;
+}
+
+@media (max-width: 400px) {
+  .chip { padding: 7px 11px; font-size: 12px; }
+  .sub-links { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="logo">📍</div>
+  <div>
+    <div class="title">렌탈<span>파인더</span></div>
+    <div class="subtitle">미국 내 렌탈 & 서비스 검색</div>
+  </div>
+</div>
+
+<!-- Search Box -->
+<div class="search-box">
+  <h2>🔍 지역 검색</h2>
+
+  <div class="form-group">
+    <label>주(State)</label>
+    <select id="state" onchange="updateCities()">
+      <option value="">-- 주 선택 --</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label>도시(City)</label>
+    <select id="city">
+      <option value="">-- 도시 선택 --</option>
+    </select>
+  </div>
+
+  <div class="or-divider">또는 주소 직접 입력</div>
+
+  <div class="form-group">
+    <input type="text" id="addressInput" placeholder="예: 1234 Main St, Dallas, TX">
+  </div>
+
+  <div class="form-group">
+    <label>무엇을 찾으시나요?</label>
+    <div class="chip-group">
+      <div class="chip active" onclick="toggleChip(this)">전체</div>
+      <div class="chip" onclick="toggleChip(this)">🚜 장비렌탈</div>
+      <div class="chip" onclick="toggleChip(this)">🚗 차량렌탈</div>
+      <div class="chip" onclick="toggleChip(this)">🏨 숙소</div>
+      <div class="chip" onclick="toggleChip(this)">🏠 주거</div>
+      <div class="chip" onclick="toggleChip(this)">🍚 식당</div>
+      <div class="chip" onclick="toggleChip(this)">🔧 철물점</div>
+      <div class="chip" onclick="toggleChip(this)">📦 창고</div>
+    </div>
+  </div>
+
+  <button class="btn-search" onclick="doSearch()">🔍 바로 찾기</button>
+
+  <button class="btn-gps" id="gpsBtn" onclick="gpsSearch()">
+    <span class="gps-icon">📡</span> 현재 위치로 검색
+  </button>
+</div>
+
+<!-- Results -->
+<div id="results"></div>
+
+<!-- Footer -->
+<div class="footer">
+  렌탈파인더 &copy; 2026 | Google Maps 기반
+</div>
+
+<script>
+/* ========== Region Data: US States & Major Cities ========== */
+const regions = {
+  "Alabama": ["Birmingham","Huntsville","Mobile","Montgomery","Tuscaloosa"],
+  "Alaska": ["Anchorage","Fairbanks","Juneau","Sitka","Ketchikan"],
+  "Arizona": ["Phoenix","Tucson","Mesa","Chandler","Scottsdale","Gilbert","Tempe","Glendale"],
+  "Arkansas": ["Little Rock","Fort Smith","Fayetteville","Springdale","Jonesboro"],
+  "California": ["Los Angeles","San Francisco","San Diego","San Jose","Sacramento","Fresno","Oakland","Long Beach","Anaheim","Bakersfield","Riverside","Irvine","Santa Ana","Stockton"],
+  "Colorado": ["Denver","Colorado Springs","Aurora","Fort Collins","Lakewood","Boulder"],
+  "Connecticut": ["Bridgeport","New Haven","Hartford","Stamford","Waterbury"],
+  "Delaware": ["Wilmington","Dover","Newark","Middletown","Bear"],
+  "Florida": ["Miami","Orlando","Tampa","Jacksonville","Fort Lauderdale","St. Petersburg","Hialeah","Tallahassee","Cape Coral","Port St. Lucie"],
+  "Georgia": ["Atlanta","Augusta","Columbus","Savannah","Athens","Macon","Sandy Springs"],
+  "Hawaii": ["Honolulu","Pearl City","Hilo","Kailua","Waipahu"],
+  "Idaho": ["Boise","Meridian","Nampa","Idaho Falls","Pocatello"],
+  "Illinois": ["Chicago","Aurora","Rockford","Naperville","Joliet","Springfield","Peoria","Elgin"],
+  "Indiana": ["Indianapolis","Fort Wayne","Evansville","South Bend","Carmel","Fishers"],
+  "Iowa": ["Des Moines","Cedar Rapids","Davenport","Sioux City","Iowa City"],
+  "Kansas": ["Wichita","Overland Park","Kansas City","Olathe","Topeka"],
+  "Kentucky": ["Louisville","Lexington","Bowling Green","Owensboro","Covington"],
+  "Louisiana": ["New Orleans","Baton Rouge","Shreveport","Lafayette","Lake Charles"],
+  "Maine": ["Portland","Lewiston","Bangor","South Portland","Auburn"],
+  "Maryland": ["Baltimore","Columbia","Germantown","Silver Spring","Waldorf","Frederick"],
+  "Massachusetts": ["Boston","Worcester","Springfield","Cambridge","Lowell","New Bedford"],
+  "Michigan": ["Detroit","Grand Rapids","Warren","Sterling Heights","Ann Arbor","Lansing","Flint"],
+  "Minnesota": ["Minneapolis","St. Paul","Rochester","Bloomington","Duluth","Brooklyn Park"],
+  "Mississippi": ["Jackson","Gulfport","Southaven","Hattiesburg","Biloxi"],
+  "Missouri": ["Kansas City","St. Louis","Springfield","Columbia","Independence"],
+  "Montana": ["Billings","Missoula","Great Falls","Bozeman","Helena"],
+  "Nebraska": ["Omaha","Lincoln","Bellevue","Grand Island","Kearney"],
+  "Nevada": ["Las Vegas","Henderson","Reno","North Las Vegas","Sparks","Carson City"],
+  "New Hampshire": ["Manchester","Nashua","Concord","Derry","Dover"],
+  "New Jersey": ["Newark","Jersey City","Paterson","Elizabeth","Edison","Trenton"],
+  "New Mexico": ["Albuquerque","Las Cruces","Rio Rancho","Santa Fe","Roswell"],
+  "New York": ["New York City","Buffalo","Rochester","Yonkers","Syracuse","Albany"],
+  "North Carolina": ["Charlotte","Raleigh","Greensboro","Durham","Winston-Salem","Fayetteville","Wilmington"],
+  "North Dakota": ["Fargo","Bismarck","Grand Forks","Minot","West Fargo"],
+  "Ohio": ["Columbus","Cleveland","Cincinnati","Toledo","Akron","Dayton"],
+  "Oklahoma": ["Oklahoma City","Tulsa","Norman","Broken Arrow","Edmond"],
+  "Oregon": ["Portland","Salem","Eugene","Gresham","Hillsboro","Bend"],
+  "Pennsylvania": ["Philadelphia","Pittsburgh","Allentown","Reading","Erie","Harrisburg"],
+  "Rhode Island": ["Providence","Warwick","Cranston","Pawtucket","East Providence"],
+  "South Carolina": ["Charleston","Columbia","North Charleston","Mount Pleasant","Greenville"],
+  "South Dakota": ["Sioux Falls","Rapid City","Aberdeen","Brookings","Watertown"],
+  "Tennessee": ["Nashville","Memphis","Knoxville","Chattanooga","Clarksville","Murfreesboro"],
+  "Texas": ["Houston","San Antonio","Dallas","Austin","Fort Worth","El Paso","Arlington","Plano","Lubbock","Corpus Christi","Laredo","Irving"],
+  "Utah": ["Salt Lake City","West Valley City","Provo","West Jordan","Orem","Sandy","Ogden","St. George"],
+  "Vermont": ["Burlington","South Burlington","Rutland","Barre","Montpelier"],
+  "Virginia": ["Virginia Beach","Norfolk","Chesapeake","Richmond","Newport News","Alexandria","Arlington"],
+  "Washington": ["Seattle","Spokane","Tacoma","Vancouver","Bellevue","Kent","Everett"],
+  "West Virginia": ["Charleston","Huntington","Morgantown","Parkersburg","Wheeling"],
+  "Wisconsin": ["Milwaukee","Madison","Green Bay","Kenosha","Racine","Appleton"],
+  "Wyoming": ["Cheyenne","Casper","Laramie","Gillette","Rock Springs"]
+};
+
+/* ========== Initialize Dropdowns ========== */
+(function init() {
+  const stateSelect = document.getElementById('state');
+  Object.keys(regions).sort().forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s;
+    opt.textContent = s;
+    stateSelect.appendChild(opt);
+  });
+})();
+
+function updateCities() {
+  const state = document.getElementById('state').value;
+  const citySelect = document.getElementById('city');
+  citySelect.innerHTML = '<option value="">-- 도시 선택 --</option>';
+  if (state && regions[state]) {
+    regions[state].forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c;
+      opt.textContent = c;
+      citySelect.appendChild(opt);
+    });
+  }
+}
+
+/* ========== Chip Toggle ========== */
+function toggleChip(el) {
+  const chips = document.querySelectorAll('.chip');
+  const isAll = el.textContent.trim() === '전체';
+
+  if (isAll) {
+    chips.forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+  } else {
+    chips[0].classList.remove('active'); // remove "All"
+    el.classList.toggle('active');
+    // if none selected, activate All
+    const anyActive = [...chips].slice(1).some(c => c.classList.contains('active'));
+    if (!anyActive) chips[0].classList.add('active');
+  }
+}
+
+function getSelectedCategories() {
+  const chips = document.querySelectorAll('.chip.active');
+  return [...chips].map(c => {
+    const txt = c.textContent.replace(/[^\w\s\uAC00-\uD7AF]/g, '').trim();
+    // Map Korean labels to internal keys
+    const map = {'전체':'all','장비렌탈':'equipment','차량렌탈':'vehicles','숙소':'hotels','주거':'housing','식당':'food','철물점':'hardware','창고':'storage'};
+    return map[txt] || txt.toLowerCase();
+  });
+}
+
+/* ========== Location ========== */
+function getLoc() {
+  const addr = document.getElementById('addressInput').value.trim();
+  if (addr) return extractArea(addr);
+  const state = document.getElementById('state').value;
+  const city = document.getElementById('city').value;
+  if (city && state) return city + ', ' + state;
+  if (state) return state;
+  return '';
+}
+
+function extractArea(addr) {
+  // Remove street numbers and zip codes, keep city/state
+  let clean = addr.replace(/^\d+\s+/g, '').replace(/\b\d{5}(-\d{4})?\b/g, '').trim();
+  // If comma-separated, take last 2 parts (city, state)
+  const parts = clean.split(',').map(s => s.trim()).filter(Boolean);
+  if (parts.length >= 2) return parts.slice(-2).join(', ');
+  return clean;
+}
+
+/* ========== Search ========== */
+function doSearch() {
+  const loc = getLoc();
+  if (!loc) {
+    alert('주/도시를 선택하거나 주소를 입력해주세요.');
+    return;
+  }
+  const cats = getSelectedCategories();
+  // Open Google Maps with first relevant query
+  const mapQuery = cats.includes('all') ? 'rental near ' + loc : cats[0] + ' rental near ' + loc;
+  window.open('https://www.google.com/maps/search/' + encodeURIComponent(mapQuery), '_blank');
+  showResults(loc, cats);
+}
+
+/* ========== GPS ========== */
+function gpsSearch() {
+  const btn = document.getElementById('gpsBtn');
+  if (!navigator.geolocation) {
+    alert('이 브라우저에서는 GPS를 지원하지 않습니다.');
+    return;
+  }
+  btn.classList.add('loading');
+  btn.innerHTML = '<span class="gps-icon">📡</span> 위치 감지 중...';
+
+  navigator.geolocation.getCurrentPosition(
+    pos => reverseGeocode(pos.coords.latitude, pos.coords.longitude),
+    err => {
+      btn.classList.remove('loading');
+      btn.innerHTML = '<span class="gps-icon">📡</span> 현재 위치로 검색';
+      alert('위치를 감지할 수 없습니다. 위치 접근을 허용해주세요.');
+    },
+    { enableHighAccuracy: true, timeout: 10000 }
+  );
+}
+
+function reverseGeocode(lat, lng) {
+  const btn = document.getElementById('gpsBtn');
+  fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=en&zoom=12`)
+    .then(r => r.json())
+    .then(data => {
+      btn.classList.remove('loading');
+      btn.innerHTML = '<span class="gps-icon">📡</span> 현재 위치로 검색';
+
+      const a = data.address || {};
+      const city = a.city || a.town || a.village || a.county || '';
+      const state = a.state || '';
+      const loc = city && state ? city + ', ' + state : city || state || data.display_name || '';
+
+      if (loc) {
+        document.getElementById('addressInput').value = loc;
+        const cats = getSelectedCategories();
+        const mapQuery = cats.includes('all') ? 'rental near ' + loc : cats[0] + ' rental near ' + loc;
+        window.open('https://www.google.com/maps/search/' + encodeURIComponent(mapQuery), '_blank');
+        showResults(loc, cats);
+      } else {
+        gpsDirectMap(lat, lng);
+      }
+    })
+    .catch(() => {
+      btn.classList.remove('loading');
+      btn.innerHTML = '<span class="gps-icon">📡</span> 현재 위치로 검색';
+      gpsDirectMap(lat, lng);
+    });
+}
+
+function gpsDirectMap(lat, lng) {
+  window.open(`https://www.google.com/maps/search/rental/@${lat},${lng},14z`, '_blank');
+}
+
+/* ========== Show Results ========== */
+function showResults(loc, cats) {
+  const el = document.getElementById('results');
+  const e = s => encodeURIComponent(s);
+  const isAll = cats.includes('all');
+
+  let html = `<div class="status-bar">✅ 검색 결과: <strong>${loc}</strong></div>`;
+
+  // ---- 지도 열기 ----
+  html += `<div class="result-card">
+    <h3>🗺️ 지도 열기</h3>
+    <div class="sub-links">
+      <a href="https://www.google.com/maps/search/${e('rental near ' + loc)}" target="_blank">
+        📍 구글 지도 <span class="arrow">›</span>
+      </a>
+      <a href="https://www.google.com/search?q=${e('rental near ' + loc)}" target="_blank">
+        🔍 구글 검색 <span class="arrow">›</span>
+      </a>
+    </div>
+  </div>`;
+
+  // ---- 장비 렌탈 ----
+  if (isAll || cats.includes('equipment')) {
+    const equips = [
+      {icon:"⛏️", label:"굴삭기", q:"Excavator"},
+      {icon:"🏗️", label:"크레인", q:"Crane"},
+      {icon:"📦", label:"지게차", q:"Forklift"},
+      {icon:"📐", label:"시저리프트", q:"Scissor Lift"},
+      {icon:"🚛", label:"덤프트럭", q:"Dump Truck"},
+      {icon:"🚜", label:"로더", q:"Loader"},
+      {icon:"🔧", label:"붐리프트", q:"Boom Lift"},
+      {icon:"🛞", label:"롤러·콤팩터", q:"Roller Compactor"},
+      {icon:"🔨", label:"스키드스티어", q:"Skid Steer"},
+      {icon:"🏍️", label:"미니굴삭기", q:"Mini Excavator"}
+    ];
+    html += `<div class="result-card">
+      <h3>🚜 장비 렌탈</h3>
+      <div class="links">`;
+    equips.forEach(eq => {
+      html += `<a href="https://www.google.com/maps/search/${e(eq.q + ' rental near ' + loc)}" target="_blank">
+        ${eq.icon} ${eq.label} 렌탈 <span class="arrow">›</span>
+      </a>`;
+    });
+    html += `</div>
+      <div style="margin-top:10px">
+        <div class="sub-links">
+          <a href="https://www.unitedrentals.com/locations?address=${e(loc)}" target="_blank">
+            🟠 United Rentals <span class="arrow">›</span>
+          </a>
+          <a href="https://www.sunbeltrentals.com/locations/?q=${e(loc)}" target="_blank">
+            🟡 Sunbelt Rentals <span class="arrow">›</span>
+          </a>
+          <a href="https://www.google.com/search?q=${e('equipment rental near ' + loc)}" target="_blank">
+            🔍 전체 검색 <span class="arrow">›</span>
+          </a>
+          <a href="https://www.yelp.com/search?find_desc=${e('equipment rental')}&find_loc=${e(loc)}" target="_blank">
+            ⭐ Yelp 리뷰 <span class="arrow">›</span>
+          </a>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // ---- 차량 렌탈 ----
+  if (isAll || cats.includes('vehicles')) {
+    html += `<div class="result-card">
+      <h3>🚗 차량 렌탈</h3>
+      <div class="sub-links">
+        <a href="https://www.google.com/maps/search/${e('car rental near ' + loc)}" target="_blank">
+          🚗 승용차 렌탈 <span class="arrow">›</span>
+        </a>
+        <a href="https://www.google.com/maps/search/${e('truck rental near ' + loc)}" target="_blank">
+          🚛 트럭 렌탈 <span class="arrow">›</span>
+        </a>
+        <a href="https://www.google.com/maps/search/${e('van rental near ' + loc)}" target="_blank">
+          🚐 밴 렌탈 <span class="arrow">›</span>
+        </a>
+        <a href="https://www.uhaul.com/Locations/" target="_blank">
+          📦 U-Haul <span class="arrow">›</span>
+        </a>
+        <a href="https://www.pensketruckrental.com/locations/" target="_blank">
+          🟡 Penske <span class="arrow">›</span>
+        </a>
+        <a href="https://www.enterprise.com/en/car-rental/locations.html" target="_blank">
+          🟢 Enterprise <span class="arrow">›</span>
+        </a>
+        <a href="https://www.yelp.com/search?find_desc=${e('car rental')}&find_loc=${e(loc)}" target="_blank">
+          ⭐ Yelp 리뷰 <span class="arrow">›</span>
+        </a>
+      </div>
+    </div>`;
+  }
+
+  // ---- 숙소 ----
+  if (isAll || cats.includes('hotels')) {
+    html += `<div class="result-card">
+      <h3>🏨 숙소</h3>
+      <div class="sub-links">
+        <a href="https://www.google.com/maps/search/${e('hotel near ' + loc)}" target="_blank">
+          🗺️ 호텔 지도 검색 <span class="arrow">›</span>
+        </a>
+        <a href="https://www.google.com/maps/search/${e('motel near ' + loc)}" target="_blank">
+          🏩 모텔 지도 검색 <span class="arrow">›</span>
+        </a>
+        <a href="https://www.google.com/maps/search/${e('extended stay near ' + loc)}" target="_blank">
+          🏢 장기 숙박 <span class="arrow">›</span>
+        </a>
+        <a href="https://www.booking.com/searchresults.html?ss=${e(loc)}" target="_blank">
+          🔵 Booking.com <span class="arrow">›</span>
+        </a>
+        <a href="https://www.airbnb.com/s/${e(loc)}/homes" target="_blank">
+          🏡 Airbnb <span class="arrow">›</span>
+        </a>
+        <a href="https://www.google.com/travel/hotels/${e(loc)}" target="_blank">
+          🏨 구글 호텔 <span class="arrow">›</span>
+        </a>
+        <a href="https://www.yelp.com/search?find_desc=${e('hotel')}&find_loc=${e(loc)}" target="_blank">
+          ⭐ Yelp 리뷰 <span class="arrow">›</span>
+        </a>
+      </div>
+    </div>`;
+  }
+
+  // ---- 주거·아파트 ----
+  if (isAll || cats.includes('housing')) {
+    html += `<div class="result-card">
+      <h3>🏠 주거·아파트</h3>
+      <div class="sub-links">
+        <a href="https://www.google.com/maps/search/${e('apartments for rent near ' + loc)}" target="_blank">
+          🗺️ 아파트 지도 검색 <span class="arrow">›</span>
+        </a>
+        <a href="https://www.zillow.com/homes/for_rent/${e(loc)}_rb/" target="_blank">
+          🟦 Zillow <span class="arrow">›</span>
+        </a>
+        <a href="https://www.apartments.com/${e(loc.toLowerCase().replace(/[,\s]+/g, '-'))}/" target="_blank">
+          🟩 Apartments.com <span class="arrow">›</span>
+        </a>
+        <a href="https://www.realtor.com/apartments/${e(loc.toLowerCase().replace(/[,\s]+/g, '-'))}" target="_blank">
+          🔴 Realtor.com <span class="arrow">›</span>
+        </a>
+        <a href="https://www.google.com/search?q=${e('rooms for rent near ' + loc)}" target="_blank">
+          🔍 룸 렌트 <span class="arrow">›</span>
+        </a>
+        <a href="https://www.google.com/search?q=${e('craigslist apartments ' + loc)}" target="_blank">
+          📋 Craigslist <span class="arrow">›</span>
+        </a>
+      </div>
+    </div>`;
+  }
+
+  // ---- 식당 ----
+  if (isAll || cats.includes('food')) {
+    html += `<div class="result-card">
+      <h3>🍚 한식·아시안 레스토랑</h3>
+      <div class="links">
+        <a href="https://www.google.com/maps/search/${e('Korean restaurant near ' + loc)}" target="_blank">
+          🇰🇷 한식 레스토랑 <span class="arrow">›</span>
+        </a>
+        <a href="https://www.google.com/maps/search/${e('Korean BBQ near ' + loc)}" target="_blank">
+          🥩 한국 BBQ (고기집) <span class="arrow">›</span>
+        </a>
+        <a href="https://www.google.com/maps/search/${e('Korean fried chicken near ' + loc)}" target="_blank">
+          🍗 한국 치킨 <span class="arrow">›</span>
+        </a>
+        <a href="https://www.google.com/maps/search/${e('Asian restaurant near ' + loc)}" target="_blank">
+          🍜 아시안 레스토랑 <span class="arrow">›</span>
+        </a>
+        <a href="https://www.google.com/maps/search/${e('Chinese restaurant near ' + loc)}" target="_blank">
+          🥟 중식 레스토랑 <span class="arrow">›</span>
+        </a>
+        <a href="https://www.google.com/maps/search/${e('Japanese restaurant near ' + loc)}" target="_blank">
+          🍣 일식 레스토랑 <span class="arrow">›</span>
+        </a>
+        <a href="https://www.google.com/maps/search/${e('Thai restaurant near ' + loc)}" target="_blank">
+          🍛 태국 레스토랑 <span class="arrow">›</span>
+        </a>
+        <a href="https://www.google.com/maps/search/${e('Vietnamese restaurant near ' + loc)}" target="_blank">
+          🍲 베트남 레스토랑 <span class="arrow">›</span>
+        </a>
+      </div>
+      <div style="margin-top:10px">
+        <div class="sub-links">
+          <a href="https://www.yelp.com/search?find_desc=${e('korean restaurant')}&find_loc=${e(loc)}" target="_blank">
+            ⭐ 한식 Yelp 리뷰 <span class="arrow">›</span>
+          </a>
+          <a href="https://www.yelp.com/search?find_desc=${e('asian restaurant')}&find_loc=${e(loc)}" target="_blank">
+            ⭐ 아시안 Yelp 리뷰 <span class="arrow">›</span>
+          </a>
+        </div>
+      </div>
+    </div>`;
+
+    html += `<div class="result-card">
+      <h3>🌾 글루텐프리 레스토랑</h3>
+      <div class="links">
+        <a href="https://www.google.com/maps/search/${e('gluten free restaurant near ' + loc)}" target="_blank">
+          🌿 글루텐프리 레스토랑 (지도) <span class="arrow">›</span>
+        </a>
+        <a href="https://www.google.com/maps/search/${e('gluten free bakery near ' + loc)}" target="_blank">
+          🍞 글루텐프리 베이커리 <span class="arrow">›</span>
+        </a>
+        <a href="https://www.google.com/maps/search/${e('gluten free pizza near ' + loc)}" target="_blank">
+          🍕 글루텐프리 피자 <span class="arrow">›</span>
+        </a>
+        <a href="https://www.google.com/maps/search/${e('celiac friendly restaurant near ' + loc)}" target="_blank">
+          ✅ 셀리악 친화 레스토랑 <span class="arrow">›</span>
+        </a>
+        <a href="https://www.google.com/search?q=${e('gluten free restaurants near ' + loc)}" target="_blank">
+          🔍 글루텐프리 전체 검색 <span class="arrow">›</span>
+        </a>
+      </div>
+      <div style="margin-top:10px">
+        <div class="sub-links">
+          <a href="https://www.yelp.com/search?find_desc=${e('gluten free')}&find_loc=${e(loc)}" target="_blank">
+            ⭐ 글루텐프리 Yelp <span class="arrow">›</span>
+          </a>
+          <a href="https://www.findmeglutenfree.com/search?loc=${e(loc)}" target="_blank">
+            🌾 FindMeGlutenFree <span class="arrow">›</span>
+          </a>
+        </div>
+      </div>
+    </div>`;
+
+    html += `<div class="result-card">
+      <h3>🛒 아시안 식료품점·마트</h3>
+      <div class="links">
+        <a href="https://www.google.com/maps/search/${e('Asian grocery store near ' + loc)}" target="_blank">
+          🏪 아시안 식료품점 (지도) <span class="arrow">›</span>
+        </a>
+        <a href="https://www.google.com/maps/search/${e('Korean grocery store near ' + loc)}" target="_blank">
+          🇰🇷 한국 식료품점 <span class="arrow">›</span>
+        </a>
+        <a href="https://www.google.com/maps/search/${e('H Mart near ' + loc)}" target="_blank">
+          🟢 H Mart (한국 마트) <span class="arrow">›</span>
+        </a>
+        <a href="https://www.google.com/maps/search/${e('99 Ranch Market near ' + loc)}" target="_blank">
+          🔴 99 Ranch Market <span class="arrow">›</span>
+        </a>
+        <a href="https://www.google.com/maps/search/${e('Chinese grocery store near ' + loc)}" target="_blank">
+          🏬 중국 식료품점 <span class="arrow">›</span>
+        </a>
+        <a href="https://www.google.com/maps/search/${e('Japanese grocery store near ' + loc)}" target="_blank">
+          🏬 일본 식료품점 <span class="arrow">›</span>
+        </a>
+      </div>
+      <div style="margin-top:10px">
+        <div class="sub-links">
+          <a href="https://www.yelp.com/search?find_desc=${e('asian grocery')}&find_loc=${e(loc)}" target="_blank">
+            ⭐ 아시안마트 Yelp <span class="arrow">›</span>
+          </a>
+          <a href="https://www.google.com/search?q=${e('asian supermarket near ' + loc)}" target="_blank">
+            🔍 전체 검색 <span class="arrow">›</span>
+          </a>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // ---- 철물점·공구 ----
+  if (isAll || cats.includes('hardware')) {
+    html += `<div class="result-card">
+      <h3>🔧 철물점·공구</h3>
+      <div class="sub-links">
+        <a href="https://www.google.com/maps/search/${e('hardware store near ' + loc)}" target="_blank">
+          🔩 철물점 <span class="arrow">›</span>
+        </a>
+        <a href="https://www.google.com/maps/search/${e('Home Depot near ' + loc)}" target="_blank">
+          🟠 Home Depot <span class="arrow">›</span>
+        </a>
+        <a href="https://www.google.com/maps/search/${e('Lowes near ' + loc)}" target="_blank">
+          🔵 Lowe's <span class="arrow">›</span>
+        </a>
+        <a href="https://www.google.com/maps/search/${e('Ace Hardware near ' + loc)}" target="_blank">
+          🔴 Ace Hardware <span class="arrow">›</span>
+        </a>
+        <a href="https://www.google.com/maps/search/${e('tool rental near ' + loc)}" target="_blank">
+          🔧 공구 렌탈 <span class="arrow">›</span>
+        </a>
+        <a href="https://www.yelp.com/search?find_desc=${e('hardware store')}&find_loc=${e(loc)}" target="_blank">
+          ⭐ Yelp 리뷰 <span class="arrow">›</span>
+        </a>
+      </div>
+    </div>`;
+  }
+
+  // ---- 창고·저장 ----
+  if (isAll || cats.includes('storage')) {
+    html += `<div class="result-card">
+      <h3>📦 창고·저장공간</h3>
+      <div class="sub-links">
+        <a href="https://www.google.com/maps/search/${e('self storage near ' + loc)}" target="_blank">
+          🗺️ 창고 지도 검색 <span class="arrow">›</span>
+        </a>
+        <a href="https://www.google.com/maps/search/${e('Public Storage near ' + loc)}" target="_blank">
+          🟠 Public Storage <span class="arrow">›</span>
+        </a>
+        <a href="https://www.google.com/maps/search/${e('Extra Space Storage near ' + loc)}" target="_blank">
+          🟢 Extra Space Storage <span class="arrow">›</span>
+        </a>
+        <a href="https://www.google.com/search?q=${e('storage units near ' + loc)}" target="_blank">
+          🔍 전체 검색 <span class="arrow">›</span>
+        </a>
+        <a href="https://www.yelp.com/search?find_desc=${e('self storage')}&find_loc=${e(loc)}" target="_blank">
+          ⭐ Yelp 리뷰 <span class="arrow">›</span>
+        </a>
+      </div>
+    </div>`;
+  }
+
+  // ---- 더 찾아보기 ----
+  html += `<div class="result-card">
+    <h3>🔗 더 찾아보기</h3>
+    <div class="sub-links">
+      <a href="https://www.google.com/search?q=${e('rental services near ' + loc)}" target="_blank">
+        🔍 구글 검색 <span class="arrow">›</span>
+      </a>
+      <a href="https://www.yelp.com/search?find_desc=${e('rental')}&find_loc=${e(loc)}" target="_blank">
+        ⭐ Yelp 전체 렌탈 <span class="arrow">›</span>
+      </a>
+      <a href="https://www.google.com/maps/search/${e('rental near ' + loc)}" target="_blank">
+        🗺️ 전체 지도 <span class="arrow">›</span>
+      </a>
+      <a href="https://www.google.com/search?q=${e(loc + ' yellow pages rental')}" target="_blank">
+        📒 Yellow Pages <span class="arrow">›</span>
+      </a>
+    </div>
+  </div>`;
+
+  el.innerHTML = html;
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+</script>
+</body>
+</html>
