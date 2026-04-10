@@ -331,6 +331,7 @@ select:focus, input[type="text"]:focus {
       <div class="chip" onclick="toggleChip(this)">🥢 아시안</div>
       <div class="chip" onclick="toggleChip(this)">🔧 철물점</div>
       <div class="chip" onclick="toggleChip(this)">📦 창고</div>
+      <div class="chip" onclick="toggleChip(this)">🇰🇷 한인정보</div>
     </div>
   </div>
 
@@ -451,7 +452,7 @@ function getSelectedCategories() {
   return [...chips].map(c => {
     const txt = c.textContent.replace(/[^\w\s\uAC00-\uD7AF]/g, '').trim();
     // Map Korean labels to internal keys
-    const map = {'전체':'all','장비렌탈':'equipment','차량렌탈':'vehicles','숙소':'hotels','홈스테이':'homestay','주거':'housing','식당':'food','글루텐프리':'glutenfree','아시안':'asian','철물점':'hardware','창고':'storage'};
+    const map = {'전체':'all','장비렌탈':'equipment','차량렌탈':'vehicles','숙소':'hotels','홈스테이':'homestay','주거':'housing','식당':'food','글루텐프리':'glutenfree','아시안':'asian','철물점':'hardware','창고':'storage','한인정보':'korean'};
     return map[txt] || txt.toLowerCase();
   });
 }
@@ -909,6 +910,69 @@ function showResults(loc, cats) {
         </a>
         <a href="https://www.yelp.com/search?find_desc=${e('self storage')}&find_loc=${e(loc)}" target="_blank">
           ⭐ Yelp 리뷰 <span class="arrow">›</span>
+        </a>
+      </div>
+    </div>`;
+  }
+
+  // ---- 한인 커뮤니티·정보 ----
+  if (isAll || cats.includes('korean')) {
+    html += `<div class="result-card">
+      <h3>🇰🇷 한인 커뮤니티·단체</h3>
+      <div class="links">
+        <a href="https://www.google.com/search?q=${e('Korean American Association ' + loc)}" target="_blank">
+          🏛️ 한인회 <span class="arrow">›</span>
+        </a>
+        <a href="https://www.google.com/search?q=${e('Korean church near ' + loc)}" target="_blank">
+          ⛪ 한인 교회 <span class="arrow">›</span>
+        </a>
+        <a href="https://www.google.com/search?q=${e('Korean language school near ' + loc)}" target="_blank">
+          🎓 한국어 학교 <span class="arrow">›</span>
+        </a>
+        <a href="https://www.google.com/search?q=${e('Korean doctor near ' + loc)}" target="_blank">
+          🏥 한인 병원·의사 <span class="arrow">›</span>
+        </a>
+        <a href="https://www.google.com/search?q=${e('Korean lawyer near ' + loc)}" target="_blank">
+          ⚖️ 한인 변호사 <span class="arrow">›</span>
+        </a>
+        <a href="https://www.google.com/search?q=${e('Korean CPA accountant near ' + loc)}" target="_blank">
+          🏦 한인 회계사·세무사 <span class="arrow">›</span>
+        </a>
+      </div>
+    </div>`;
+
+    html += `<div class="result-card">
+      <h3>📰 한인 미디어·뉴스</h3>
+      <div class="links">
+        <a href="https://www.koreatimes.com" target="_blank">
+          📰 한국일보 USA <span class="arrow">›</span>
+        </a>
+        <a href="https://www.koreadaily.com" target="_blank">
+          📰 중앙일보 USA <span class="arrow">›</span>
+        </a>
+        <a href="https://www.google.com/search?q=${e('Korean TV station ' + loc)}" target="_blank">
+          📺 한인 방송 <span class="arrow">›</span>
+        </a>
+        <a href="https://www.google.com/search?q=${e('Korean community forum ' + loc)}" target="_blank">
+          💬 한인 커뮤니티 게시판 <span class="arrow">›</span>
+        </a>
+      </div>
+    </div>`;
+
+    html += `<div class="result-card">
+      <h3>🏢 공공기관·영사관</h3>
+      <div class="links">
+        <a href="https://overseas.mofa.go.kr" target="_blank">
+          🏢 주미대한민국 대사관 <span class="arrow">›</span>
+        </a>
+        <a href="https://www.google.com/search?q=${e('Korean consulate near ' + loc)}" target="_blank">
+          🏢 한국 영사관 <span class="arrow">›</span>
+        </a>
+        <a href="https://www.google.com/search?q=${e('Korean consular services ' + loc)}" target="_blank">
+          📋 재외국민 민원 <span class="arrow">›</span>
+        </a>
+        <a href="https://www.google.com/search?q=${e('Korean emergency contact USA')}" target="_blank">
+          🆘 긴급 연락처 <span class="arrow">›</span>
         </a>
       </div>
     </div>`;
