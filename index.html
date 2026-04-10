@@ -263,6 +263,26 @@ select:focus, input[type="text"]:focus {
 </style>
 </head>
 <body>
+<script>
+// 카카오톡 인앱브라우저 → 외부브라우저 강제 열기
+(function() {
+  var ua = navigator.userAgent || '';
+  var isKakao = /KAKAOTALK/i.test(ua);
+  if (!isKakao) return;
+
+  var url = window.location.href;
+  var isAndroid = /Android/i.test(ua);
+  var isIOS = /iPhone|iPad|iPod/i.test(ua);
+
+  if (isAndroid) {
+    var intentUrl = 'intent://' + url.replace(/^https?:\/\//i, '') +
+      '#Intent;scheme=https;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;package=com.android.chrome;S.browser_fallback_url=' + encodeURIComponent(url) + ';end';
+    window.location.replace(intentUrl);
+  } else if (isIOS) {
+    window.location.href = 'kakaotalk://web/openExternal?url=' + encodeURIComponent(url);
+  }
+})();
+</script>
 
 <!-- Header -->
 <div class="header">
